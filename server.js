@@ -3,21 +3,28 @@ const app = express();
 
 app.use(express.json());
 
-// default command
-let currentCommand = { command: "none" };
+let database = {};
 
-// when Roblox asks for command
-app.get("/command", (req, res) => {
-    res.json(currentCommand);
+app.post("/save", (req, res) => {
+    const { userId, exp } = req.body;
+
+    database[userId] = { 
+        exp: exp
+                       };
+
+    console.log("Saved:", userId, database[userId]);
+
+    res.send({ status: "saved" });
 });
 
-// when YOU change command
-app.post("/set", (req, res) => {
-    currentCommand = req.body;
-    res.send("Command updated");
+app.get("/load/:userId", (req, res) => {
+    const userId = req.params.userId;
+
+    const data = database[userId] || { exp: 0 };
+
+    res.send(data);
 });
 
-// start server
 app.listen(3000, () => {
     console.log("Server running on port 3000");
 });
